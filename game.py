@@ -153,7 +153,7 @@ while not done:
                                 if nbClick == 1:
                                         if selected == 1 and pygame.mouse.get_pos()[0]>x_window/4:
                                                 print(1)
-                                                image_file = "eolien.png"
+                                                image_file = "eolienne.png"
                                                 image = pygame.image.load(image_file).convert_alpha()
                                                 screen.blit(image, pygame.mouse.get_pos())
                                                 Mouse_x, Mouse_y = pygame.mouse.get_pos()
@@ -181,7 +181,7 @@ while not done:
                                                 nbClick+=1
                                         if selected == 4 and pygame.mouse.get_pos()[0]>x_window/4:
                                                 print(4)
-                                                image_file = "hydrolique.png"
+                                                image_file = "hydraulique.png"
                                                 image = pygame.image.load(image_file).convert_alpha()
                                                 screen.blit(image, pygame.mouse.get_pos())
                                                 Mouse_x, Mouse_y = pygame.mouse.get_pos()
