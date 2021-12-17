@@ -36,7 +36,7 @@ hydroliqueImage = pygame.image.load("hydraulique.png")
 routeImage = pygame.image.load("route.png")
 deleteImage = pygame.image.load("corbeille.png")
 font = pygame.font.SysFont("Times new roman",26)
-pointDeConsoImage = pygame.image.load("point.png")
+pointDeConsoImage = pygame.image.load("point2.png")
 
 drawn = False
 points = []
