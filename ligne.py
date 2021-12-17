@@ -5,7 +5,7 @@ import pygame
 class Ligne:
 
 
-    def __init__(self, prod = None, conso = None, capacite = 0, transit = 0):
+    def __init__(self, reseau=None, prod = None, conso = None, capacite = 0, transit = 0):
         self.capacite = capacite
         self.prod = prod
         self.conso = conso
