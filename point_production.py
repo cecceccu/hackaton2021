@@ -8,6 +8,8 @@ class Point_Production:
         self.rect = rect
         self.categorie = categorie
         self.capacite = 0
+        self.nom = ""
+        self.on = False
 
     def add_group(self, ind, groupe):
         self.groupes[ind] = groupe
@@ -16,3 +18,6 @@ class Point_Production:
     def remove_group(self, ind):
         del self.groupes[ind]
         self.capacite = sum([groupe.capacite for groupe in self.groupes.values()])
+
+    def switch_state(self):
+        self.on = not self.on
