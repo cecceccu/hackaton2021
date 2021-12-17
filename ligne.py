@@ -5,11 +5,12 @@ import pygame
 class Ligne:
 
 
-    def __init__(self, reseau=None, prod = None, conso = None, capacite = 0, transit = 0):
+    def __init__(self, reseau=None, prod = None, conso = None, capacite = 0, transit = 0, on=False):
         self.capacite = capacite
         self.prod = prod
         self.conso = conso
         self.transit = transit
+        self.on = on
 
     def set_prod(self, prod):
         self.prod = prod

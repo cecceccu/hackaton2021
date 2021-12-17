@@ -27,6 +27,17 @@ fig2 = pylab.figure(figsize=[8, 6], # Inches
                    dpi=50,        # 100 dots per inch, so the resulting buffer is 400x400 pixels
                    )
 
+bg = pygame.image.load("corse.png").convert()
+biogazImage = pygame.image.load("biogaz.png").convert()
+eolienImage = pygame.image.load("eolienne.png").convert()
+thermiqueImage = pygame.image.load("thermique.png")
+photovoltaiqueImage = pygame.image.load("photovoltaique.png")
+hydroliqueImage = pygame.image.load("hydraulique.png")
+routeImage = pygame.image.load("route.png")
+deleteImage = pygame.image.load("corbeille.png")
+font = pygame.font.SysFont("Times new roman",26)
+pointDeConsoImage = pygame.image.load("point.png")
+
 drawn = False
 points = []
 listeroutes2=[]
@@ -42,9 +53,9 @@ game_speed = 10
 x_window = 1050
 y_window = 700
 
-color = (255, 0, 0)
+color = (241, 151, 42, 255) #Orange
+blue = (65,198, 250)
 
-blue = (0, 0, 255)
 SCENE = "admin"
 
 pygame.init()
@@ -67,7 +78,7 @@ i_conso = 0
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((x_window, y_window))
 done = False
-bg = pygame.image.load("corse.png").convert()
+#bg = pygame.image.load("corse.png").convert()
 data = excelLoader.load_excel("Fichier-source.csv")
 del data[0]
 for i in range(-9, 1):
@@ -82,6 +93,7 @@ speed_slider = slider.Slider((30, 30))
 
 points_production = []
 boutons_groupes = []
+screen.fill(blue)
 
 
 rect = pygame.Rect(30,30,200, 100)
@@ -129,12 +141,12 @@ while not done:
                                                 selected_object = value
                                                 active = value.on
                                                 text  = pygame.font.SysFont("timesnewroman", 15).render("Centrale : " + str(selected_object.nom), True, (0,0,0,0))
-                                                pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(0, 200, x_window/4, y_window))
-                                                rect_obj = pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(0, 200, x_window/4, 50))
+                                                pygame.draw.rect(screen, color, pygame.Rect(0, 200, x_window/4, y_window))
+                                                rect_obj = pygame.draw.rect(screen, color, pygame.Rect(0, 200, x_window/4, 50))
                                                 text_rect = text.get_rect(center=rect_obj.center)
                                                 screen.blit(text, text_rect)
-                                                rect_obj = pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(0, 400, x_window/4, 50))
-                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Capacité de production : " + str(selected_object.capacite), True, (0,0,0,0))
+                                                rect_obj = pygame.draw.rect(screen, color, pygame.Rect(0, 400, x_window/4, 50))
+                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Capacité de production : " + str(selected_object.capacite) + " MW", True, (0,0,0,0))
                                                 text_rect = text.get_rect(center=rect_obj.center)
                                                 screen.blit(text, text_rect)
 
@@ -166,6 +178,23 @@ while not done:
                                         prod_renouvelable = sum([obj.capacite for obj in list_prod.values() if obj.on and obj.categorie != "thermique"])
 
                                         print(prod_totale)
+
+                        if not PAUSED:
+                                for ville in list_conso.values():
+                                        ville.total_conso = prod_totale * (int(ville.pourcentage))/100
+                                        ville.recu = 0
+                                for l in list_route.values():
+                                        l.on = l.prod.on
+
+                                        if l.on:
+                                                l.conso.recu += l.capacite
+
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+
+                                        for ville in list_conso.values():
+                                                if ville.rect.collidepoint(event.pos):
+                                                        pass
+
                 clock.tick(game_speed)
 
 
@@ -177,8 +206,9 @@ while not done:
 
 
                                 
-                    
+                   
                 if not PAUSED:
+
                         ax.clear()
                         ax2.clear()
                         y = np.array([0,50,100,150,200,250,300])
@@ -243,29 +273,57 @@ while not done:
                 
         
         elif SCENE == "admin":
+                pygame.draw.rect(screen, color, pygame.Rect(0, 0, x_window/4, y_window))
+                eolien =  pygame.draw.rect(screen, blue, pygame.Rect(10, 10, ((x_window/4) - 20), 50 ))
+                screen.blit(font.render("Eolienne",False,(255,255,255)),(75,15))
+                screen.blit(eolienImage,eolien)
+                thermique = pygame.draw.rect(screen, blue, pygame.Rect(10, 70, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Thermique",False,(255,255,255)),(60,75))
+                screen.blit(thermiqueImage,thermique)
+                photovoltaique = pygame.draw.rect(screen, blue, pygame.Rect(10, 130, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Photovoltäique",False,(255,255,255)),(58,135))
+                screen.blit(photovoltaiqueImage,photovoltaique)
+                hydrolique = pygame.draw.rect(screen, blue, pygame.Rect(10, 190, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Hydraulique",False,(255,255,255)),(60,190))
+                screen.blit(hydroliqueImage,hydrolique)
+                biogaz = pygame.draw.rect(screen, blue, pygame.Rect(10, 250, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Biogaz",False,(255,255,255)),(70,250))
+                screen.blit(biogazImage,biogaz)
+                route = pygame.draw.rect(screen, blue, pygame.Rect(10, 310, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Ligne HTB",False,(255,255,255)),(70,310))
+                screen.blit(routeImage,route)
+                delete = pygame.draw.rect(screen, blue, pygame.Rect(10, 430, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Supprimer",False,(255,255,255)),(70,430))
+                screen.blit(deleteImage,delete)
+                pointDeConso = pygame.draw.rect(screen, blue, pygame.Rect(10, 370, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Point de conso",False,(255,255,255)),(60,370))
+                screen.blit(pointDeConsoImage,pointDeConso)
+                changescene = pygame.draw.rect(screen, blue, pygame.Rect(10, 490, ((x_window / 4) - 20), 50))
+                screen.blit(font.render("Simulation",False,(255,255,255)),(60,490))
+
                 for ev in pygame.event.get():
                         screen.blit(bg, (x_window, y_window))
                         if ev.type == pygame.QUIT:
                                 pygame.quit()
                         # Drawing Rectangle
                         #c origine, y origine, largeur, longueur
-                        pygame.draw.rect(screen, color, pygame.Rect(0, 0, x_window/4, y_window))
-                        eolien =  pygame.draw.rect(screen, blue, pygame.Rect(10, 10, ((x_window/4) - 20), 50 ))
-                        thermique = pygame.draw.rect(screen, blue, pygame.Rect(10, 70, ((x_window / 4) - 20), 50))
-                        photovoltaique = pygame.draw.rect(screen, blue, pygame.Rect(10, 130, ((x_window / 4) - 20), 50))
-                        hydrolique = pygame.draw.rect(screen, blue, pygame.Rect(10, 190, ((x_window / 4) - 20), 50))
-                        biogaz = pygame.draw.rect(screen, blue, pygame.Rect(10, 250, ((x_window / 4) - 20), 50))
-                        pointDeConso = pygame.draw.rect(screen, blue, pygame.Rect(10, 310, ((x_window / 4) - 20), 50))
-                        route = pygame.draw.rect(screen, blue, pygame.Rect(10, 370, ((x_window / 4) - 20), 50))
-                        delete = pygame.draw.rect(screen, blue, pygame.Rect(10, 430, ((x_window / 4) - 20), 50))
-                        changescene = pygame.draw.rect(screen, blue, pygame.Rect(10, 490, ((x_window / 4) - 20), 50))
+                        # pygame.draw.rect(screen, color, pygame.Rect(0, 0, x_window/4, y_window))
+                        # eolien =  pygame.draw.rect(screen, blue, pygame.Rect(10, 10, ((x_window/4) - 20), 50 ))
+                        # thermique = pygame.draw.rect(screen, blue, pygame.Rect(10, 70, ((x_window / 4) - 20), 50))
+                        # photovoltaique = pygame.draw.rect(screen, blue, pygame.Rect(10, 130, ((x_window / 4) - 20), 50))
+                        # hydrolique = pygame.draw.rect(screen, blue, pygame.Rect(10, 190, ((x_window / 4) - 20), 50))
+                        # biogaz = pygame.draw.rect(screen, blue, pygame.Rect(10, 250, ((x_window / 4) - 20), 50))
+                        # pointDeConso = pygame.draw.rect(screen, blue, pygame.Rect(10, 310, ((x_window / 4) - 20), 50))
+                        # route = pygame.draw.rect(screen, blue, pygame.Rect(10, 370, ((x_window / 4) - 20), 50))
+                        # delete = pygame.draw.rect(screen, blue, pygame.Rect(10, 430, ((x_window / 4) - 20), 50))
+                        # changescene = pygame.draw.rect(screen, blue, pygame.Rect(10, 490, ((x_window / 4) - 20), 50))
                         
                         if ev.type == pygame.MOUSEBUTTONDOWN and ev.button!= 3:
                                 for key, value in list_prod.items():
                                         if value.rect.collidepoint(ev.pos): 
                                                 selected_object = value
                                                 text  = pygame.font.SysFont("timesnewroman", 15).render("Nom de la centrale", True, (0,0,0,0))
-                                                pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                pygame.draw.rect(screen, color, pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
                                                 rect_obj1 = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 150, x_window/4, 50))
                                                 text_rect = text.get_rect(center=rect_obj1.center)
                                                 screen.blit(text, text_rect)
@@ -333,16 +391,18 @@ while not done:
                                         screen.blit(font_text, text_rect)
                                 elif active == 2:
                                         string_format = "Capacité : "
+                                        mw_string = " MW"
                                         if ev.key == pygame.K_RETURN:
                                                 selected_object.add_group(1, Groupe_Production(int(value_text)))
                                                 print(selected_object.capacite)
                                                 value_text = ''
                                                 string_format = ''
+                                                mw_string = ''
                                         elif ev.key == pygame.K_BACKSPACE:
                                                 value_text = value_text[:-1]
                                         else:
                                                 value_text += ev.unicode
-                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text) + mw_string, True, (0,0,0,0))
                                         text_rect = font_text.get_rect(center=rect_obj2.center)
                                         if value_text!="":
                                                 pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 250, x_window/4, 50))
@@ -358,7 +418,7 @@ while not done:
                                                 value_text = value_text[:-1]
                                         else:
                                                 value_text += ev.unicode
-                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text) + mw_string, True, (0,0,0,0))
                                         text_rect = font_text.get_rect(center=rect_obj3.center)
                                         if value_text!="":
                                                 pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 350, x_window/4, 50))
@@ -375,7 +435,7 @@ while not done:
                                         else:
                                                 value_text += ev.unicode
 
-                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text) + mw_string, True, (0,0,0,0))
                                         text_rect = font_text.get_rect(center=rect_obj4.center)
 
                                         if value_text!="":
@@ -392,7 +452,7 @@ while not done:
                                                 value_text = value_text[:-1]
                                         else:
                                                 value_text += ev.unicode
-                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text) + mw_string, True, (0,0,0,0))
                                         text_rect = font_text.get_rect(center=rect_obj5.center)
 
                                         if value_text!="":
@@ -408,49 +468,49 @@ while not done:
                                         if nbClick == 1:
                                                 if selected == 1 and pygame.mouse.get_pos()[0]>x_window/4:
                                                         print(1)
-                                                        image_file = "eolienne.png"
+                                                        image_file = "eoliennetransparent.png"
                                                         image = pygame.image.load(image_file).convert_alpha()
                                                         screen.blit(image, pygame.mouse.get_pos())
                                                         Mouse_x, Mouse_y = pygame.mouse.get_pos()
                                                         nbProd+=1
 
-                                                        list_prod[nbProd] = Point_Production("eolienne", pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(Mouse_x, Mouse_y, 41, 42), 1))
+                                                        list_prod[nbProd] = Point_Production("eolienne", pygame.draw.rect(screen, (241, 161, 42, 255), pygame.Rect(Mouse_x, Mouse_y, 41, 42), 1))
                                                         nbClick+=1
                                                 if selected == 2 and pygame.mouse.get_pos()[0]>x_window/4:
                                                         print(2)
-                                                        image_file = "thermique.png"
+                                                        image_file = "thermiquetransparent.png"
                                                         image = pygame.image.load(image_file).convert_alpha()
                                                         screen.blit(image, pygame.mouse.get_pos())
                                                         Mouse_x, Mouse_y = pygame.mouse.get_pos()
                                                         nbProd+=1
-                                                        list_prod[nbProd] = Point_Production("thermique", pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(Mouse_x, Mouse_y, 50, 41), 1))
+                                                        list_prod[nbProd] = Point_Production("thermique", pygame.draw.rect(screen, (241, 161, 42, 255), pygame.Rect(Mouse_x, Mouse_y, 50, 41), 1))
                                                         nbClick+=1
                                                 if selected == 3 and pygame.mouse.get_pos()[0]>x_window/4:
                                                         print(3)
-                                                        image_file = "photovoltaique.png"
+                                                        image_file = "photovoltaiquetransparent.png"
                                                         image = pygame.image.load(image_file).convert_alpha()
                                                         screen.blit(image, pygame.mouse.get_pos())
                                                         Mouse_x, Mouse_y = pygame.mouse.get_pos()
                                                         nbProd+=1
-                                                        list_prod[nbProd] = Point_Production("photovoltaique", pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(Mouse_x, Mouse_y, 47, 33), 1))
+                                                        list_prod[nbProd] = Point_Production("photovoltaique", pygame.draw.rect(screen, (241, 161, 42, 255), pygame.Rect(Mouse_x, Mouse_y, 47, 33), 1))
                                                         nbClick+=1
                                                 if selected == 4 and pygame.mouse.get_pos()[0]>x_window/4:
                                                         print(4)
-                                                        image_file = "hydraulique.png"
+                                                        image_file = "hydrauliquetransparent.png"
                                                         image = pygame.image.load(image_file).convert_alpha()
                                                         screen.blit(image, pygame.mouse.get_pos())
                                                         Mouse_x, Mouse_y = pygame.mouse.get_pos()
                                                         nbProd+=1
-                                                        list_prod[nbProd] = Point_Production("hydraulique", pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(Mouse_x, Mouse_y, 63, 32), 1))
+                                                        list_prod[nbProd] = Point_Production("hydraulique", pygame.draw.rect(screen, (241, 161, 42, 255), pygame.Rect(Mouse_x, Mouse_y, 63, 32), 1))
                                                         nbClick+=1
                                                 if selected == 5 and pygame.mouse.get_pos()[0]>x_window/4:
                                                         print(5)
-                                                        image_file = "biogaz.png"
+                                                        image_file = "biogaztransparent.png"
                                                         image = pygame.image.load(image_file).convert_alpha()
                                                         screen.blit(image, pygame.mouse.get_pos())
                                                         Mouse_x, Mouse_y = pygame.mouse.get_pos()
                                                         nbProd+=1
-                                                        list_prod[nbProd] = Point_Production("biogaz", pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(Mouse_x, Mouse_y, 47, 32), 1))
+                                                        list_prod[nbProd] = Point_Production("biogaz", pygame.draw.rect(screen, (241, 161, 42, 255), pygame.Rect(Mouse_x, Mouse_y, 47, 32), 1))
                                                         nbClick+=1
                                                 if selected == 7 and pygame.mouse.get_pos() > (x_window/4, y_window):
                                                         print(7)
@@ -461,7 +521,7 @@ while not done:
 
 
                                                         if (not nameExist and not pourcentageExist):
-                                                                pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                                pygame.draw.rect(screen, color, pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
                                                                 rect_obj1 = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 150, x_window/4, 50))
                                                                 text_rect = text.get_rect(center=rect_obj1.center)
                                                                 screen.blit(text, text_rect)
@@ -485,7 +545,7 @@ while not done:
                                                                 screen.blit(image, pygame.mouse.get_pos())
                                                                 Mouse_x, Mouse_y = pygame.mouse.get_pos()
                                                                 nbConso+=1
-                                                                list_conso[nbConso] = Point_conso(rect = pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(Mouse_x, Mouse_y, 47, 32), 1))
+                                                                list_conso[nbConso] = Point_conso(rect = pygame.draw.rect(screen, (241, 161, 42, 255), pygame.Rect(Mouse_x, Mouse_y, 47, 32), 1))
                                                                 i_conso+=1
 
                                         if eolien.collidepoint(ev.pos):
@@ -525,8 +585,9 @@ while not done:
                                         if delete.collidepoint(ev.pos):
                                                 selected = 8
                                         if changescene.collidepoint(ev.pos):
-                                                pygame.draw.rect(screen, (0,0,0,0), pygame.Rect(0, 0, x_window/4, y_window))
-                                                pygame.draw.rect(screen, (0,0,0,0), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                pygame.draw.rect(screen, blue, pygame.Rect(0, 0, x_window/4, y_window))
+                                                pygame.draw.rect(screen, blue, pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                
                                                 selected_object = None
                                                 SCENE = "player"
                                         for key, value in list_prod.items():
@@ -534,8 +595,8 @@ while not done:
                                                 if selected==8:
                                                         if value.rect.collidepoint(ev.pos):
                                                                 del list_prod[key]
-                                                                pygame.draw.rect(screen, (0,0,0,0), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
-                                                                pygame.draw.rect(screen, (255,255,255,255), value)
+                                                                pygame.draw.rect(screen, (blue), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                                pygame.draw.rect(screen, (241, 161, 42, 255), value)
                                                                 break
                                                 
                                                 
@@ -544,8 +605,8 @@ while not done:
                                                 if selected==8:
                                                         if value.rect.collidepoint(ev.pos):
                                                                 del list_conso[key]
-                                                                pygame.draw.rect(screen, (0,0,0,0), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
-                                                                pygame.draw.rect(screen, (255,255,255,255), value.rect)
+                                                                pygame.draw.rect(screen, (blue), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                                pygame.draw.rect(screen, (241, 161, 42, 255), value.rect)
                                                                 break
 
                                 else:
@@ -617,25 +678,27 @@ while not done:
                                         nbClick+=1
                                         nameExist = False
                                         pourcentageExist = False
-                                        pygame.draw.rect(screen, (0,0,0,0), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                        pygame.draw.rect(screen, blue, pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
                                         i_conso=0
 
                         if nbReseau in list_reseau and  len(list_reseau[nbReseau]) >= 2:
                                 print("bbbbbb")
                                 active = 9
                                 if not drawn:
-                                        pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                        pygame.draw.rect(screen, color, pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
                                         drawn = True
                                 rect_obj = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 325, x_window/4, 50))
                                 if ev.type == pygame.KEYDOWN:
                                         print("ccccc")
                                         string_format = "Capacité : "
+                                        mw_string = " MW"
                                         if ev.key == pygame.K_RETURN:
                                                 capacite = int(value_text)
+                                                mw_string = ''
                                                 value_text = ''
                                                 string_format = ''
                                                 drawn = False
-                                                pygame.draw.rect(screen, (0,0,0,0), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                pygame.draw.rect(screen, color, pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
                                                 prod = list_reseau_prod
                                                 cons = list_reseau_conso
                                                 nbRoute+=1
@@ -652,7 +715,7 @@ while not done:
                                                 value_text += ev.unicode
                                 
                                 
-                                font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text) + mw_string, True, (0,0,0,0))
                                 text_rect = font_text.get_rect(center=rect_obj.center)
 
                                 if value_text!="":
