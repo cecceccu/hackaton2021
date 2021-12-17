@@ -54,6 +54,7 @@ canvas = agg.FigureCanvasAgg(fig)
 speed_slider = slider.Slider((30, 30))
 
 points_production = []
+boutons_groupes = []
 
 
 rect = pygame.Rect(30,30,200, 100)
@@ -63,6 +64,10 @@ screen.blit(bg, ((x_window/4)+20,0))
 
 production = []
 PAUSED = False
+
+value_text=''
+active = 0
+selected_object = None
 while not done:
         if SCENE == "player":
                 for event in pygame.event.get():
@@ -79,18 +84,10 @@ while not done:
                                 if event.key == pygame.K_p: 
                                         PAUSED = True
                                 if event.key == pygame.K_s: 
-                                        PAUSED = False
+                                        PAUSED = False                                        
+                                                
 
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                                for key, value in list_prod.items():
-                                        if value.rect.collidepoint(event.pos): 
-                                                text  = pygame.font.SysFont(<your font here>, <font size here>).render(<text>, True, <color>)
-                                                pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(0, 0, x_window/4, y_window))
-                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(0, 150, x_window/4, 50))
-                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(0, 250, x_window/4, 50))
-                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(0, 350, x_window/4, 50))
-                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(0, 450, x_window/4, 50))
-                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(0, 550, x_window/4, 50))
+
                                 
                         
                 if not PAUSED:
@@ -146,6 +143,141 @@ while not done:
                         delete = pygame.draw.rect(screen, blue, pygame.Rect(10, 430, ((x_window / 4) - 20), 50))
                         changescene = pygame.draw.rect(screen, blue, pygame.Rect(10, 490, ((x_window / 4) - 20), 50))
                         
+                        if ev.type == pygame.MOUSEBUTTONDOWN:
+                                for key, value in list_prod.items():
+                                        if value.rect.collidepoint(ev.pos): 
+                                                selected_object = value
+                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Ajouter un groupe de production", True, (0,0,0,0))
+                                                pygame.draw.rect(screen, (255,255,255,255), pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
+                                                rect_obj1 = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 150, x_window/4, 50))
+                                                text_rect = text.get_rect(center=rect_obj1.center)
+                                                screen.blit(text, text_rect)
+                                                rect_obj2 = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 250, x_window/4, 50))
+                                                text_rect = text.get_rect(center=rect_obj2.center)
+                                                screen.blit(text, text_rect)
+                                                rect_obj3 = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 350, x_window/4, 50))
+                                                text_rect = text.get_rect(center=rect_obj3.center)
+                                                screen.blit(text, text_rect)
+                                                rect_obj4 = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 450, x_window/4, 50))
+                                                text_rect = text.get_rect(center=rect_obj4.center)
+                                                screen.blit(text, text_rect)
+                                                rect_obj5 = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 550, x_window/4, 50))
+                                                text_rect = text.get_rect(center=rect_obj5.center)
+                                                screen.blit(text, text_rect)
+
+                                                boutons_groupes = [rect_obj1, rect_obj2, rect_obj3, rect_obj4, rect_obj5]
+
+                                                
+
+
+
+                                for (i, bouton) in enumerate(boutons_groupes):
+                                        if bouton.collidepoint(ev.pos):
+                                                if i == 0:
+                                                        if 1 in selected_object.groupes:
+                                                                selected_object.remove_group(1)
+                                                        pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 150, x_window/4, 50))
+                                                        active = 1
+                                                elif i== 1:
+                                                        if 2 in selected_object.groupes:
+                                                                selected_object.remove_group(2)
+                                                        pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 250, x_window/4, 50))
+                                                        active = 2
+                                                elif i== 2:
+                                                        if 3 in selected_object.groupes:
+                                                                selected_object.remove_group(3)
+                                                        pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 350, x_window/4, 50))
+                                                        active = 3
+                                                elif i== 3:
+                                                        if 4 in selected_object.groupes:
+                                                                selected_object.remove_group(4)
+                                                        pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 450, x_window/4, 50))
+                                                        active = 4
+                                                elif i== 4:
+                                                        if 5 in selected_object.groupes:
+                                                                selected_object.remove_group(5)
+                                                        pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 550, x_window/4, 50))
+                                                        active = 5
+                        if ev.type == pygame.KEYDOWN:
+                                if active == 1:
+                                        string_format = "Capacité : "
+                                        if ev.key == pygame.K_RETURN:
+                                                selected_object.add_group(1, Groupe_Production(value_text))
+                                                value_text = ''
+                                                string_format = ''
+                                        elif ev.key == pygame.K_BACKSPACE:
+                                                value_text = value_text[:-1]
+                                        else:
+                                                value_text += ev.unicode
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        text_rect = font_text.get_rect(center=rect_obj1.center)
+                                        if value_text!="":
+                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 150, x_window/4, 50))
+                                        screen.blit(font_text, text_rect)
+                                elif active == 2:
+                                        string_format = "Capacité : "
+                                        if ev.key == pygame.K_RETURN:
+                                                selected_object.add_group(2, Groupe_Production(value_text))
+                                                value_text = ''
+                                                string_format = ''
+                                        elif ev.key == pygame.K_BACKSPACE:
+                                                value_text = value_text[:-1]
+                                        else:
+                                                value_text += ev.unicode
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        text_rect = font_text.get_rect(center=rect_obj2.center)
+                                        if value_text!="":
+                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 250, x_window/4, 50))
+                                        screen.blit(font_text, text_rect)
+                                elif active == 3:
+                                        string_format = "Capacité : "
+                                        if ev.key == pygame.K_RETURN:
+                                                selected_object.add_group(3, Groupe_Production(value_text))
+                                                value_text = ''
+                                                string_format = ''
+                                        elif ev.key == pygame.K_BACKSPACE:
+                                                value_text = value_text[:-1]
+                                        else:
+                                                value_text += ev.unicode
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        text_rect = font_text.get_rect(center=rect_obj3.center)
+                                        if value_text!="":
+                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 350, x_window/4, 50))
+                                        screen.blit(font_text, text_rect)
+                                elif active == 4:
+                                        string_format = "Capacité : "
+                                        if ev.key == pygame.K_RETURN:
+                                                selected_object.add_group(4, Groupe_Production(value_text))
+                                                value_text = ''
+                                                string_format = ''
+                                        elif ev.key == pygame.K_BACKSPACE:
+                                                value_text = value_text[:-1]
+                                        else:
+                                                value_text += ev.unicode
+
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        text_rect = font_text.get_rect(center=rect_obj4.center)
+
+                                        if value_text!="":
+                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 450, x_window/4, 50))
+                                        screen.blit(font_text, text_rect)
+                                elif active == 5:
+                                        string_format = "Capacité : "
+                                        if ev.key == pygame.K_RETURN:
+                                                selected_object.add_group(5, Groupe_Production(value_text))
+                                                value_text = ''
+                                                string_format = ''
+                                        elif ev.key == pygame.K_BACKSPACE:
+                                                value_text = value_text[:-1]
+                                        else:
+                                                value_text += ev.unicode
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render(string_format + str(value_text), True, (0,0,0,0))
+                                        text_rect = font_text.get_rect(center=rect_obj5.center)
+
+                                        if value_text!="":
+                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 550, x_window/4, 50))
+                                        screen.blit(font_text, text_rect)
+
                 
                         if ev.type == pygame.MOUSEBUTTONDOWN :
                         #if select 1->eolienne, 2->thermique, 3->photovoltaique, 4->hydraulique, 5->biogaz
