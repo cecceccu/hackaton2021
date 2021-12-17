@@ -202,7 +202,8 @@ while not done:
                                 if active == 1:
                                         string_format = "Capacité : "
                                         if ev.key == pygame.K_RETURN:
-                                                selected_object.add_group(1, Groupe_Production(value_text))
+                                                selected_object.add_group(1, Groupe_Production(int(value_text)))
+                                                print(selected_object.capacite)
                                                 value_text = ''
                                                 string_format = ''
                                         elif ev.key == pygame.K_BACKSPACE:
@@ -217,7 +218,8 @@ while not done:
                                 elif active == 2:
                                         string_format = "Capacité : "
                                         if ev.key == pygame.K_RETURN:
-                                                selected_object.add_group(2, Groupe_Production(value_text))
+                                                selected_object.add_group(2, Groupe_Production(int(value_text)))
+                                                print(selected_object.capacite)
                                                 value_text = ''
                                                 string_format = ''
                                         elif ev.key == pygame.K_BACKSPACE:
@@ -232,7 +234,8 @@ while not done:
                                 elif active == 3:
                                         string_format = "Capacité : "
                                         if ev.key == pygame.K_RETURN:
-                                                selected_object.add_group(3, Groupe_Production(value_text))
+                                                selected_object.add_group(3, Groupe_Production(int(value_text)))
+                                                print(selected_object.capacite)
                                                 value_text = ''
                                                 string_format = ''
                                         elif ev.key == pygame.K_BACKSPACE:
@@ -247,7 +250,8 @@ while not done:
                                 elif active == 4:
                                         string_format = "Capacité : "
                                         if ev.key == pygame.K_RETURN:
-                                                selected_object.add_group(4, Groupe_Production(value_text))
+                                                selected_object.add_group(4, Groupe_Production(int(value_text)))
+                                                print(selected_object.capacite)
                                                 value_text = ''
                                                 string_format = ''
                                         elif ev.key == pygame.K_BACKSPACE:
@@ -264,7 +268,8 @@ while not done:
                                 elif active == 5:
                                         string_format = "Capacité : "
                                         if ev.key == pygame.K_RETURN:
-                                                selected_object.add_group(5, Groupe_Production(value_text))
+                                                selected_object.add_group(5, Groupe_Production(int(value_text)))
+                                                print(selected_object.capacite)
                                                 value_text = ''
                                                 string_format = ''
                                         elif ev.key == pygame.K_BACKSPACE:
