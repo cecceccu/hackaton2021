@@ -20,10 +20,10 @@ matplotlib.use("Agg")
 import matplotlib.backends.backend_agg as agg
 import pylab
 
-fig = pylab.figure(figsize=[8, 6], # Inches
+fig = pylab.figure(figsize=[8, 7], # Inches
                    dpi=50,        # 100 dots per inch, so the resulting buffer is 400x400 pixels
                    )
-fig2 = pylab.figure(figsize=[8, 6], # Inches
+fig2 = pylab.figure(figsize=[8, 7], # Inches
                    dpi=50,        # 100 dots per inch, so the resulting buffer is 400x400 pixels
                    )
 
@@ -115,6 +115,23 @@ rect_obj = None
 prod_totale=0
 prod_renouvelable=0
 nbConso=0
+changing_route=False
+def isBetween(a, b, c):
+    crossproduct = (c[1] - a[1]) * (b[0] - a[0]) - (c[0] - a[0]) * (b[1] - a[1])
+
+    # compare versus epsilon for floating point values, or != 0 if using integers
+    if abs(crossproduct) > 40:
+        return False
+
+    dotproduct = (c[0] - a[0]) * (b[0] - a[0]) + (c[1] - a[1])*(b[1] - a[1])
+    if dotproduct < 40:
+        return False
+
+    squaredlengthba = (b[0] - a[0])*(b[0] - a[0]) + (b[1] - a[1])*(b[1] - a[1])
+    if dotproduct > squaredlengthba + 40:
+        return False
+
+    return True
 while not done:
         if SCENE == "player":
                 for event in pygame.event.get():
@@ -178,22 +195,75 @@ while not done:
                                         prod_renouvelable = sum([obj.capacite for obj in list_prod.values() if obj.on and obj.categorie != "thermique"])
 
                                         print(prod_totale)
+                        conso_totale = sum([obj.capacite for obj in list_prod.values() if obj.on])
+                        for ville in list_conso.values():
+                                ville.total_conso = float([data[k] for k in sorted(data.keys())[:10]][0]["charge"].replace('"',""))  * (int(ville.pourcentage))/100
+                                ville.recu = 0
+                        for l in list_route.values():
+                                l.on = l.prod.on
 
-                        if not PAUSED:
-                                for ville in list_conso.values():
-                                        ville.total_conso = prod_totale * (int(ville.pourcentage))/100
-                                        ville.recu = 0
+                                if l.on:
+                                        l.conso.recu += min(l.transit, l.prod.capacite)
+
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+
                                 for l in list_route.values():
-                                        l.on = l.prod.on
+                                        print(event.pos)
+                                        if isBetween(l.a, l.b, event.pos):
+                                                selected_object = l
+                                                pygame.draw.rect(screen, color, pygame.Rect(0, 200, x_window/4, y_window))
+                                                rect_obj9 = pygame.draw.rect(screen, color, pygame.Rect(0, 200, x_window/4, 50))
+                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Capacite : " + str(selected_object.capacite) + " MW", True, (0,0,0,0))
+                                                text_rect = text.get_rect(center=rect_obj9.center)
+                                                screen.blit(text, text_rect)
+                                                changing_route = True
 
-                                        if l.on:
-                                                l.conso.recu += l.capacite
+                                for ville in list_conso.values():
+                                        if ville.rect.collidepoint(event.pos):
+                                                selected_object = ville
+                                                pygame.draw.rect(screen, color, pygame.Rect(0, 200, x_window/4, y_window))
+                                                rect_obj8 = pygame.draw.rect(screen, color, pygame.Rect(0, 200, x_window/4, 50))
+                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Ville : " + str(selected_object.nom), True, (0,0,0,0))
+                                                text_rect = text.get_rect(center=rect_obj8.center)
+                                                screen.blit(text, text_rect)
+                                                rect_obj8 = pygame.draw.rect(screen, color, pygame.Rect(0, 300, x_window/4, 50))
+                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Consommation actuelle : " + str("{:.2f}".format(selected_object.total_conso)) + " MW", True, (0,0,0,0))
+                                                text_rect = text.get_rect(center=rect_obj8.center)
+                                                screen.blit(text, text_rect)
+                                                rect_obj8 = pygame.draw.rect(screen, color, pygame.Rect(0, 400, x_window/4, 50))
+                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Electricite fournie : " + str(selected_object.recu) + " MW", True, (0,0,0,0))
+                                                text_rect = text.get_rect(center=rect_obj8.center)
+                                                screen.blit(text, text_rect)
+                                                rect_obj8 = pygame.draw.rect(screen, color, pygame.Rect(0, 500, x_window/4, 50))
+                                                text  = pygame.font.SysFont("timesnewroman", 15).render("Différentiel : " + str("{:.2f}".format(selected_object.recu - selected_object.total_conso)) + " MW", True, (0,0,0,0))
+                                                text_rect = text.get_rect(center=rect_obj8.center)
+                                                pygame.draw.rect(screen, (120,120,120), pygame.Rect(0, 300, x_window/4, 50))
+                                                screen.blit(text, text_rect)
 
-                                if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.type == pygame.KEYDOWN:
+                                if changing_route:
+                                        mw_string = " MW"
+                                        string_format = "Nom de la centrale : "
+                                        if event.key == pygame.K_RETURN:
+                                                selected_object.transit = min(int(value_text), selected_object.capacite)
+                                                value_text = ''
+                                                string_format = ''
+                                                mw_string = " MW"
+                                                changing_route = False
+                                                pygame.draw.rect(screen, blue, pygame.Rect(0, 200, x_window/4, y_window))
+                                        elif event.key == pygame.K_BACKSPACE:
+                                                value_text = value_text[:-1]
+                                        else:
+                                                value_text += event.unicode
+                                        rect_obj9 = pygame.draw.rect(screen, (120,120,120), pygame.Rect(0, 300, x_window/4, 50))
+                                        font_text  = pygame.font.SysFont("timesnewroman", 15).render("Régler transit: " + str(value_text) + " MW", True, (0,0,0,0))
+                                        text_rect = font_text.get_rect(center=rect_obj9.center)
+                                        if value_text!="":
+                                                pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 150, x_window/4, 50))
+                                        screen.blit(font_text, text_rect)
+                                        if not changing_route:
+                                                pygame.draw.rect(screen, blue, pygame.Rect(0, 200, x_window/4, y_window))
 
-                                        for ville in list_conso.values():
-                                                if ville.rect.collidepoint(event.pos):
-                                                        pass
 
                 clock.tick(game_speed)
 
@@ -263,7 +333,7 @@ while not done:
                         raw_data2 = renderer2.tostring_rgb()
                         size2 = canvas2.get_width_height()        
                         graph2 = pygame.image.fromstring(raw_data2, size2, "RGB")
-                        screen.blit(graph2, (650,300))
+                        screen.blit(graph2, (650,350))
                         
                         data.pop(min_key)
                         pygame.display.flip()
@@ -688,6 +758,7 @@ while not done:
                                         pygame.draw.rect(screen, color, pygame.Rect(3*x_window/4, 0, x_window/4, y_window))
                                         drawn = True
                                 rect_obj = pygame.draw.rect(screen, (120,120,120,120), pygame.Rect(3*x_window/4, 325, x_window/4, 50))
+                                mw_string = " MW"
                                 if ev.type == pygame.KEYDOWN:
                                         print("ccccc")
                                         string_format = "Capacité : "
@@ -702,7 +773,8 @@ while not done:
                                                 prod = list_reseau_prod
                                                 cons = list_reseau_conso
                                                 nbRoute+=1
-                                                list_route[nbRoute] = Ligne(reseau = pygame.draw.lines(screen, blue, False, list_reseau[nbReseau]), prod = prod, conso = cons, capacite=capacite)
+                                                list_route[nbRoute] = Ligne(reseau = pygame.draw.lines(screen, blue, False, list_reseau[nbReseau]), prod = prod, conso = cons, capacite=capacite,
+                                                a=list_reseau[nbReseau][0], b=list_reseau[nbReseau][1])
                                                 list_reseau= {}
                                                 list_reseau[0] = []
                                                 list_reseau[1] = []
